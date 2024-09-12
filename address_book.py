@@ -112,19 +112,19 @@ class AddressBook:
             
         if not self.validate_phone_number(contact.phone_number):
             print("Invalid phone number! It must contain exactly 10 digits.\n")
-            logger_init("UC-1").error("Invalid phone number.")
+            logger_init("UC-2").error("Invalid phone number.")
             return
 
         # Validate zip code
         if not self.validate_zip_code(contact.zip_code):
             print("Invalid zip code! It must contain exactly 6 digits.\n")
-            logger_init("UC-1").error("Invalid zip code.")
+            logger_init("UC-2").error("Invalid zip code.")
             return
 
         # Validate email
         if not self.validate_email(contact.email):
             print("Invalid email format! It should follow the format abc@example.com.\n")
-            logger_init("UC-1").error("Invalid email format.")
+            logger_init("UC-2").error("Invalid email format.")
             return
 
             
