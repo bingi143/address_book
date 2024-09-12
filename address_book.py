@@ -107,31 +107,31 @@ class AddressBook:
         for existing_contact in self.contacts_list:
             if existing_contact.first_name == contact.first_name and existing_contact.last_name == contact.last_name:
                 print(f"Contact {contact.first_name} {contact.last_name} already exists.\n")
-                logger_init("UC-1").info(f"Contact {contact.first_name} {contact.last_name} already exists.")
+                logger_init("UC-2").info(f"Contact {contact.first_name} {contact.last_name} already exists.")
                 return
             
         if not self.validate_phone_number(contact.phone_number):
             print("Invalid phone number! It must contain exactly 10 digits.\n")
-            logger_init("UC-1").error("Invalid phone number.")
+            logger_init("UC-2").error("Invalid phone number.")
             return
 
         # Validate zip code
         if not self.validate_zip_code(contact.zip_code):
             print("Invalid zip code! It must contain exactly 6 digits.\n")
-            logger_init("UC-1").error("Invalid zip code.")
+            logger_init("UC-2").error("Invalid zip code.")
             return
 
         # Validate email
         if not self.validate_email(contact.email):
             print("Invalid email format! It should follow the format abc@example.com.\n")
-            logger_init("UC-1").error("Invalid email format.")
+            logger_init("UC-2").error("Invalid email format.")
             return
 
             
 
         self.contacts_list.append(contact)
         print(f"Contact for {contact.first_name} {contact.last_name} added successfully.\n")
-        logger_init("UC-1").info("added contact successfully")
+        logger_init("UC-2").info("added contact successfully")
 
 
     def display_all_contacts(self):
@@ -164,6 +164,7 @@ class AddressBook:
 
         if not contacts_to_edit:
             print("no name in contact to edit")
+            logger_init("UC-3").info("ther is no name in contact to edit")
             return
         
         print(f"Found {len(contacts_to_edit)} contact(s):")
@@ -211,6 +212,7 @@ class AddressBook:
             print("Invalid choice. No changes were made.")
         
         print("Contact updated successfully.\n")
+        logger_init("UC-3").info("Contact update succussfully")
 
     
     def delete_person_from_contacts(self):
@@ -227,6 +229,7 @@ class AddressBook:
 
         if not contacts_to_delete:
             print("no name in contact to delete from contacts")
+            logger_init("UC-4").info("There is no name in contact to delete from contacts ")
             return
         
         print(f"Found {len(contacts_to_delete)} contact(s):")
@@ -244,7 +247,7 @@ class AddressBook:
         
         self.contacts_list.remove(selected_contact)
         print(f"Contact {selected_contact.first_name} {selected_contact.last_name} deleted successfully.\n")
-
+        logger_init("UC-4").info(f"Contact {selected_contact.first_name} {selected_contact.last_name} deleted successfully.\n")
 
 
 def main():
@@ -289,7 +292,6 @@ def main():
 
         else:
             print("Invalid choice, please try again.")
-
 
 
 if __name__=="__main__":
