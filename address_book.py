@@ -10,6 +10,9 @@
 ''' 
 
 
+import re
+from my_logging import logger_init
+
 class Contacts:
 
     def __init__(self,first_name,last_name,address,city,state,zip_code,phone_number,email):
@@ -47,23 +50,94 @@ class AddressBook:
     def __init__(self):
         self.contacts_list = []
 
+    def validate_phone_number(self,phone_number):
+        '''
+           Description: 
+                   this function validate the phone number having 10 number or not 
+           Parameters: 
+                   phone_number: phone number digits
+           Return: 
+                   Returns the true or false
+        '''
+        if re.match(r'\d{10}',phone_number):
+            return True
+        else:
+            return False
+        
+    def validate_zip_code(self,zip_code):
+        '''
+           Description: 
+                   this function validate the zip code having 6 number or not 
+           Parameters: 
+                   zip_code: code 
+           Return: 
+                   Return the True or False
+        '''
+        if re.match(r'\d{6}',zip_code):
+            return True
+        else:
+            return False
+        
+    def validate_email(self,email):
+
+        '''
+           Description: 
+                   this function validate the email having proper formate or not
+           Parameters: 
+                   eamil: email
+           Return: 
+                   Return the True or False
+        '''
+        if re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',email):
+            return True
+        else:
+            return False
+
+
     def add_contact(self, contact):
         '''
-        Description: 
-            this function Adds a new contact to the address book.
-        Parameters: 
-            contact: Contact object to add.
-        Return: 
-            None
+            Description: 
+                   this function Adds a new contact to the address book.
+            Parameters: 
+                   contact: Contact object to add.
+            Return: 
+                   None
         '''
+        
+        for existing_contact in self.contacts_list:
+            if existing_contact.first_name == contact.first_name and existing_contact.last_name == contact.last_name:
+                print(f"Contact {contact.first_name} {contact.last_name} already exists.\n")
+                logger_init("UC-1").info(f"Contact {contact.first_name} {contact.last_name} already exists.")
+                return
+            
+        if not self.validate_phone_number(contact.phone_number):
+            print("Invalid phone number! It must contain exactly 10 digits.\n")
+            logger_init("UC-1").error("Invalid phone number.")
+            return
+
+        # Validate zip code
+        if not self.validate_zip_code(contact.zip_code):
+            print("Invalid zip code! It must contain exactly 6 digits.\n")
+            logger_init("UC-1").error("Invalid zip code.")
+            return
+
+        # Validate email
+        if not self.validate_email(contact.email):
+            print("Invalid email format! It should follow the format abc@example.com.\n")
+            logger_init("UC-1").error("Invalid email format.")
+            return
+
+            
+
         self.contacts_list.append(contact)
         print(f"Contact for {contact.first_name} {contact.last_name} added successfully.\n")
+        logger_init("UC-1").info("added contact successfully")
 
 
     def display_all_contacts(self):
         '''
         Description: 
-            this function Displays all contacts in the address book.
+            Displays all contacts in the address book.
         Parameters: 
             None
         Return: 
@@ -74,7 +148,7 @@ class AddressBook:
         else:
             for contact in self.contacts_list:
                 contact.display()
-    
+
 
     def edit_existing_contact(self):
         '''
