@@ -32,14 +32,16 @@ class Contacts:
           Return : 
                 None
         '''
-        print(f"""first-name: {self.first_name}\n 
-              last-name: {self.last_name}\n 
-              address: {self.address}\n 
-              city: {self.city}\n 
-              state: {self.state}\n
-              zip-code: {self.zip_code}\n 
-              phone-number: {self.phone_number}\n 
-              email: {self.email}""")
+        print("****************************\n",
+              f" first-name: {self.first_name}\n",
+              f" last-name: {self.last_name}\n",
+              f" address: {self.address}\n", 
+              f" city: {self.city}\n ",
+              f" state: {self.state}\n",
+              f" zip-code: {self.zip_code}\n ",
+              f" phone-number: {self.phone_number}\n ",
+              f" email: {self.email}\n",
+              "************************")
 
 
 def main():
