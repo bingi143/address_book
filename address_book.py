@@ -107,24 +107,24 @@ class AddressBook:
         for existing_contact in self.contacts_list:
             if existing_contact.first_name == contact.first_name and existing_contact.last_name == contact.last_name:
                 print(f"Contact {contact.first_name} {contact.last_name} already exists.\n")
-                logger_init("UC-2").info(f"Contact {contact.first_name} {contact.last_name} already exists.")
+                logger_init("UC-2").info(" This name already exists in contacts.")
                 return
             
         if not self.validate_phone_number(contact.phone_number):
             print("Invalid phone number! It must contain exactly 10 digits.\n")
-            logger_init("UC-2").error("Invalid phone number.")
+            logger_init("UC-2").info("Invalid phone number.")
             return
 
         # Validate zip code
         if not self.validate_zip_code(contact.zip_code):
             print("Invalid zip code! It must contain exactly 6 digits.\n")
-            logger_init("UC-2").error("Invalid zip code.")
+            logger_init("UC-2").info("Invalid zip code.")
             return
 
         # Validate email
         if not self.validate_email(contact.email):
             print("Invalid email format! It should follow the format abc@example.com.\n")
-            logger_init("UC-2").error("Invalid email format.")
+            logger_init("UC-2").info("Invalid email format.")
             return
 
             
@@ -247,47 +247,117 @@ class AddressBook:
         
         self.contacts_list.remove(selected_contact)
         print(f"Contact {selected_contact.first_name} {selected_contact.last_name} deleted successfully.\n")
-        logger_init("UC-4").info(f"Contact {selected_contact.first_name} {selected_contact.last_name} deleted successfully.\n")
+        logger_init("UC-4").info(" selected contact deleted successfully.")
+
+
+class System:
+    def __init__(self):
+        self.address_books = {}
+
+    def add_address_book(self, name):
+        '''
+            Description: 
+                   this function Adds a new address book with a unique name
+            Parameters: 
+                   name: name of the new address book
+            Return: 
+                   None
+        '''
+        if name in self.address_books:
+            print(f"Address Book '{name}' already exists.\n")
+            logger_init("UC-6").info("this address book name already exists")
+        else:
+            self.address_books[name] = AddressBook()
+            print(f"Address Book '{name}' created successfully.\n")
+            logger_init("UC-6").info("address book created successfully")
+
+    def select_address_book(self):
+        '''
+            Description: 
+                   this function is selecting an address book by name
+            Parameters: 
+                   None
+            Return: 
+                   Returns the addres book or if it is not in return None
+        '''
+        if not self.address_books:
+            print("No address books available.\n")
+            logger_init("UC-6").info("There is no address book is available")
+            return None
+        
+        print("Available Address Books:")
+        for book_name in self.address_books:
+            print(f"- {book_name}")
+
+        selected_name = input("Enter the name of the address book to select: ")
+
+        if selected_name in self.address_books:
+            return self.address_books[selected_name]
+        else:
+            print("Address Book not found.\n")
+            return None
 
 
 def main():
 
     print("Welcome to the Address Book Program")
-    address_book = AddressBook()
+    
+    system=System()
 
     while True:
-        print("1. Add New Contact\n",
-              "2. Display All Contacts\n",
-              "3. Edit existing contact\n",
-              "4. Delete person from contacts\n",
-              "5. Exit")
+        print("1. Create New Address Book\n",
+              "2. Select an Address Book\n",
+              "3. Exit")
 
         choice = input("Enter your choice: ")
 
         if choice == '1':
-            first_name = input("Enter first name: ")
-            last_name = input("Enter last name: ")
-            address = input("Enter address: ")
-            city = input("Enter city: ")
-            state = input("Enter state: ")
-            zip_code = input("Enter zip code: ")
-            phone_number = input("Enter phone number: ")
-            email = input("Enter email: ")
-
-            new_contact = Contacts(first_name, last_name, address, city, state, zip_code, phone_number, email)
-            address_book.add_contact(new_contact)
+            book_name = input("Enter a unique name for the new Address Book: ")
+            system.add_address_book(book_name)
 
         elif choice == '2':
-            address_book.display_all_contacts()
+            selected_address_book = system.select_address_book()
 
-        elif choice=='3':
-            address_book.edit_existing_contact()
+            if selected_address_book:
+                while True:
+                    print("\n1. Add New Contact\n",
+                          "2. Display All Contacts\n",
+                          "3. Edit Existing Contact\n",
+                          "4. Delete Contact\n",
+                          "5. Back to Main Menu")
 
-        elif choice=='4':
-            address_book.delete_person_from_contacts()
+                    sub_choice = input("Enter your choice: ")
 
-        elif choice == '5':
-            print("Exiting Address Book.")
+                    if sub_choice == '1':
+                        first_name = input("Enter first name: ")
+                        last_name = input("Enter last name: ")
+                        address = input("Enter address: ")
+                        city = input("Enter city: ")
+                        state = input("Enter state: ")
+                        zip_code = input("Enter zip code: ")
+                        phone_number = input("Enter phone number: ")
+                        email = input("Enter email: ")
+
+                        new_contact = Contacts(first_name, last_name, address, city, state, zip_code, phone_number, email)
+                        selected_address_book.add_contact(new_contact)
+
+                    elif sub_choice == '2':
+                        selected_address_book.display_all_contacts()
+
+                    elif sub_choice == '3':
+                        selected_address_book.edit_existing_contact()
+
+                    elif sub_choice == '4':
+                        selected_address_book.delete_person_from_contacts()
+
+                    elif sub_choice == '5':
+                        break
+
+                    else:
+                        print("Invalid choice, please try again.")
+
+        elif choice == '3':
+            print("Exiting the Multi-Address Book System.")
             break
 
         else:
