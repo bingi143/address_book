@@ -138,6 +138,40 @@ class AddressBook:
         
         print("Contact updated successfully.\n")
 
+    
+    def delete_person_from_contacts(self):
+        '''
+        Description: 
+                  this function deleting alreaady existing contacts using name
+        Parameters: 
+                 None
+        Return: 
+                 None
+        '''
+        name=input("Enter first name of the contacts to edit: ")
+        contacts_to_delete = [contact for contact in self.contacts_list if contact.first_name == name]
+
+        if not contacts_to_delete:
+            print("no name in contact to delete from contacts")
+            return
+        
+        print(f"Found {len(contacts_to_delete)} contact(s):")
+        for i, contact in enumerate(contacts_to_delete, start=1):
+            print(f"{i}. {contact.first_name} {contact.last_name}")
+            contact.display()
+
+        
+        if len(contacts_to_delete) > 1:
+            selection = int(input("Select the contact number you want to delete: ")) - 1
+            selected_contact = contacts_to_delete[selection]
+        else:
+            selected_contact = contacts_to_delete[0]
+
+        
+        self.contacts_list.remove(selected_contact)
+        print(f"Contact {selected_contact.first_name} {selected_contact.last_name} deleted successfully.\n")
+
+
 
 def main():
 
@@ -145,10 +179,11 @@ def main():
     address_book = AddressBook()
 
     while True:
-        print("\n1. Add New Contact")
-        print("2. Display All Contacts")
-        print("3. Edit existing contact")
-        print("4. Exit")
+        print("\n1. Add New Contact\n",
+              "2. Display All Contacts\n",
+              "3. Edit existing contact\n",
+              "4. Delete person from contacts",
+              "5. Exit")
 
         choice = input("Enter your choice: ")
 
@@ -171,7 +206,10 @@ def main():
         elif choice=='3':
             address_book.edit_existing_contact()
 
-        elif choice == '4':
+        elif choice=='4':
+            address_book.delete_person_from_contacts()
+
+        elif choice == '5':
             print("Exiting Address Book.")
             break
 
