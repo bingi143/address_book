@@ -29,19 +29,97 @@ class AddressBook:
     def __init__(self):
         self.contacts_list = []
 
+    def validate_phone_number(self,phone_number):
+        '''
+           Description: 
+                   this function validate the phone number having 10 number or not 
+           Parameters: 
+                   phone_number: phone number digits
+           Return: 
+                   Returns the true or false
+        '''
+        if re.match(r'\d{10}',phone_number):
+            return True
+        else:
+            return False
+        
+    def validate_zip_code(self,zip_code):
+        '''
+           Description: 
+                   this function validate the zip code having 6 number or not 
+           Parameters: 
+                   zip_code: code 
+           Return: 
+                   Return the True or False
+        '''
+        if re.match(r'\d{6}',zip_code):
+            return True
+        else:
+            return False
+        
+    def validate_email(self,email):
+
+        '''
+           Description: 
+                   this function validate the email having proper formate or not
+           Parameters: 
+                   eamil: email
+           Return: 
+                   Return the True or False
+        '''
+        if re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',email):
+            return True
+        else:
+            return False
+
+
     def add_contact(self, contact):
+        '''
+            Description: 
+                   this function Adds a new contact to the address book.
+            Parameters: 
+                   contact: Contact object to add.
+            Return: 
+                   None
+        '''
         for existing_contact in self.contacts_list:
             if existing_contact.first_name == contact.first_name and existing_contact.last_name == contact.last_name:
                 print(f"Contact {contact.first_name} {contact.last_name} already exists.\n")
 
                 logger_init("UC-7").info(" This name already exists in contacts.")
                 return
+            
+        if not self.validate_phone_number(contact.phone_number):
+            print("Invalid phone number! It must contain exactly 10 digits.\n")
+            logger_init("UC-2").info("Invalid phone number.")
+            return
+
+        # Validate zip code
+        if not self.validate_zip_code(contact.zip_code):
+            print("Invalid zip code! It must contain exactly 6 digits.\n")
+            logger_init("UC-2").info("Invalid zip code.")
+            return
+
+        # Validate email
+        if not self.validate_email(contact.email):
+            print("Invalid email format! It should follow the format abc@example.com.\n")
+            logger_init("UC-2").info("Invalid email format.")
+            return
 
         self.contacts_list.append(contact)
         print(f"Contact for {contact.first_name} {contact.last_name} added successfully.\n")
         logger_init("UC-2").info("Added contact successfully.")
 
     def display_all_contacts(self):
+        '''
+        Description: 
+            Displays all contacts in the address book.
+        Parameters: 
+            None
+        Return: 
+            None
+        '''
+
         if not self.contacts_list:
             print("Address Book is empty.\n")
             logger_init("UC-7").info("Address book is empty")
@@ -64,6 +142,22 @@ class AddressBook:
             if (city and contact.city.lower() == city.lower()) or (state and contact.state.lower() == state.lower()):
                 results.append(contact)
         return results
+    
+    def count_by_city_or_state(self, city=None, state=None):
+        '''
+        Description:
+            This function returns the count of contacts by city or state in an address book.
+        Parameters:
+            city: City name to count (optional)
+            state: State name to count (optional)
+        Return:
+            Count of contacts by city or state.
+        '''
+        count = 0
+        for contact in self.contacts_list:
+            if (city and contact.city.lower() == city.lower()) or (state and contact.state.lower() == state.lower()):
+                count += 1
+        return count
 
 
 class System:
@@ -71,6 +165,14 @@ class System:
         self.address_books = {}
 
     def add_address_book(self, name):
+        '''
+            Description: 
+                   this function Adds a new address book with a unique name
+            Parameters: 
+                   name: name of the new address book
+            Return: 
+                   None
+        '''
         if name in self.address_books:
             print(f"Address Book '{name}' already exists.\n")
             logger_init("UC-6").info("This address book name already exists.")
@@ -80,6 +182,14 @@ class System:
             logger_init("UC-6").info("Address book created successfully.")
 
     def select_address_book(self):
+        '''
+            Description: 
+                   this function is selecting an address book by name
+            Parameters: 
+                   None
+            Return: 
+                   Returns the addres book or if it is not in return None
+        '''
         if not self.address_books:
             print("No address books available.\n")
             logger_init("UC-6").info("There is no address book available.")
@@ -110,10 +220,16 @@ class System:
             None
         '''
         all_results = []
+        city_count=0
+        state_count=0
         for book_name, address_book in self.address_books.items():
             results = address_book.search_contact_by_city_or_state(city, state)
             if results:
                 all_results.extend([(book_name, contact) for contact in results])
+                if city:
+                    city_count += address_book.count_by_city_or_state(city=city)
+                if state:
+                    state_count += address_book.count_by_city_or_state(state=state)
 
         if not all_results:
             print(f"No contacts found in city '{city}' or state '{state}'.\n")
@@ -121,6 +237,12 @@ class System:
 
         else:
             print(f"Found {len(all_results)} contact(s) in city '{city}' or state '{state}':")
+            if city:
+                print(f"Total contacts by city '{city}': {city_count}")
+                logger_init("UC-10").info(f"Total contacts by city '{city}': {city_count}")
+            if state:
+                print(f"Total contacts by state '{state}': {state_count}")
+                logger_init("UC-10").info(f"Total contacts by state '{state}': {state_count}")
             
             for book_name, contact in all_results:
                 print(f"From Address Book: {book_name}")
