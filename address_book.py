@@ -35,8 +35,6 @@ class AddressBook:
                 print(f"Contact {contact.first_name} {contact.last_name} already exists.\n")
 
                 logger_init("UC-7").info(" This name already exists in contacts.")
-
-                logger_init("UC-7").info("This name already exists in contacts.")
                 return
 
         self.contacts_list.append(contact)
@@ -46,6 +44,7 @@ class AddressBook:
     def display_all_contacts(self):
         if not self.contacts_list:
             print("Address Book is empty.\n")
+            logger_init("UC-7").info("Address book is empty")
         else:
             for contact in self.contacts_list:
                 contact.display()
@@ -87,6 +86,7 @@ class System:
             return None
 
         print("Available Address Books:")
+        logger_init("UC-6").info("Address book is available")
         for book_name in self.address_books:
             print(f"- {book_name}")
 
@@ -96,6 +96,7 @@ class System:
             return self.address_books[selected_name]
         else:
             print("Address Book not found.\n")
+            logger_init("UC-6").info("Address book not found")
             return None
 
     def search_across_address_books(self, city=None, state=None):
