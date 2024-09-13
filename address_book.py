@@ -28,7 +28,7 @@ class Contacts:
 class AddressBook:
     def __init__(self):
         self.contacts_list = []
-
+    
     def validate_phone_number(self,phone_number):
         '''
            Description: 
@@ -72,7 +72,6 @@ class AddressBook:
         else:
             return False
 
-
     def add_contact(self, contact):
         '''
             Description: 
@@ -85,8 +84,7 @@ class AddressBook:
         for existing_contact in self.contacts_list:
             if existing_contact.first_name == contact.first_name and existing_contact.last_name == contact.last_name:
                 print(f"Contact {contact.first_name} {contact.last_name} already exists.\n")
-
-                logger_init("UC-7").info(" This name already exists in contacts.")
+                logger_init("UC-7").info("This name already exists in contacts.")
                 return
             
         if not self.validate_phone_number(contact.phone_number):
@@ -106,6 +104,7 @@ class AddressBook:
             logger_init("UC-2").info("Invalid email format.")
             return
 
+
         self.contacts_list.append(contact)
         print(f"Contact for {contact.first_name} {contact.last_name} added successfully.\n")
         logger_init("UC-2").info("Added contact successfully.")
@@ -119,13 +118,111 @@ class AddressBook:
         Return: 
             None
         '''
-
         if not self.contacts_list:
             print("Address Book is empty.\n")
-            logger_init("UC-7").info("Address book is empty")
         else:
             for contact in self.contacts_list:
                 contact.display()
+
+    def edit_existing_contact(self):
+        '''
+        Description: 
+               this function editing alreaady existing contacts using name
+        Parameters: 
+               None
+        Return: 
+               None
+        '''
+        name=input("Enter first name of the contacts to edit: ")
+        contacts_to_edit = [contact for contact in self.contacts_list if contact.first_name == name]
+
+        if not contacts_to_edit:
+            print("no name in contact to edit")
+            logger_init("UC-3").info("ther is no name in contact to edit")
+            return
+        
+        print(f"Found {len(contacts_to_edit)} contact(s):")
+        for i, contact in enumerate(contacts_to_edit, start=1):
+            print(f"{i}. {contact.first_name} {contact.last_name}")
+            contact.display()
+
+        
+        if len(contacts_to_edit) > 1:
+            selection = int(input("Select the contact number you want to edit: "))
+            selected_contact = contacts_to_edit[selection]
+        else:
+            selected_contact = contacts_to_edit[0]
+
+        
+        print("\nWhat would you like to edit?\n",
+              "1. First Name\n",
+              "2. Last Name\n",
+              "3. Address\n",
+              "4. City\n",
+              "5. State\n"
+              "6. Zip Code\n"
+              "7. Phone Number\n",
+              "8. Email")
+
+        option = input("Enter the number corresponding to the field you want to edit: ")
+
+        if option == '1':
+            selected_contact.first_name = input("Enter new first name: ")
+        elif option == '2':
+            selected_contact.last_name = input("Enter new last name: ")
+        elif option == '3':
+            selected_contact.address = input("Enter new address: ")
+        elif option == '4':
+            selected_contact.city = input("Enter new city: ")
+        elif option == '5':
+            selected_contact.state = input("Enter new state: ")
+        elif option == '6':
+            selected_contact.zip_code = input("Enter new zip code: ")
+        elif option == '7':
+            selected_contact.phone_number = input("Enter new phone number: ")
+        elif option == '8':
+            selected_contact.email = input("Enter new email: ")
+        else:
+            print("Invalid choice. No changes were made.")
+        
+        print("Contact updated successfully.\n")
+        logger_init("UC-3").info("Contact update succussfully")
+
+    
+    def delete_person_from_contacts(self):
+        '''
+        Description: 
+                  this function deleting alreaady existing contacts using name
+        Parameters: 
+                 None
+        Return: 
+                 None
+        '''
+        name=input("Enter first name of the contacts to edit: ")
+        contacts_to_delete = [contact for contact in self.contacts_list if contact.first_name == name]
+
+        if not contacts_to_delete:
+            print("no name in contact to delete from contacts")
+            logger_init("UC-4").info("There is no name in contact to delete from contacts ")
+            return
+        
+        print(f"Found {len(contacts_to_delete)} contact(s):")
+        for i, contact in enumerate(contacts_to_delete, start=1):
+            print(f"{i}. {contact.first_name} {contact.last_name}")
+            contact.display()
+
+        
+        if len(contacts_to_delete) > 1:
+            selection = int(input("Select the contact number you want to delete: ")) - 1
+            selected_contact = contacts_to_delete[selection]
+        else:
+            selected_contact = contacts_to_delete[0]
+
+        
+        self.contacts_list.remove(selected_contact)
+        print(f"Contact {selected_contact.first_name} {selected_contact.last_name} deleted successfully.\n")
+        logger_init("UC-4").info(" selected contact deleted successfully.")
+
 
     def search_contact_by_city_or_state(self, city=None, state=None):
         '''
@@ -196,7 +293,6 @@ class System:
             return None
 
         print("Available Address Books:")
-        logger_init("UC-6").info("Address book is available")
         for book_name in self.address_books:
             print(f"- {book_name}")
 
@@ -206,7 +302,6 @@ class System:
             return self.address_books[selected_name]
         else:
             print("Address Book not found.\n")
-            logger_init("UC-6").info("Address book not found")
             return None
 
     def search_across_address_books(self, city=None, state=None):
@@ -273,7 +368,9 @@ def main():
                 while True:
                     print("\n1. Add New Contact\n",
                           "2. Display All Contacts\n",
-                          "3. Back to Main Menu")
+                          "3. Edit Existing Contact\n",
+                          "4. Delete Contact\n",
+                          "5. Back to Main Menu")
 
                     sub_choice = input("Enter your choice: ")
 
@@ -294,14 +391,20 @@ def main():
                         selected_address_book.display_all_contacts()
 
                     elif sub_choice == '3':
+                        selected_address_book.edit_existing_contact()
+
+                    elif sub_choice == '4':
+                        selected_address_book.delete_person_from_contacts()
+
+                    elif sub_choice == '5':
                         break
 
                     else:
                         print("Invalid choice, please try again.")
 
         elif choice == '3':
-            city = input("Enter city to search (leave blank if searching by state): ")
-            state = input("Enter state to search (leave blank if searching by city): ")
+            city = input("Enter city to search : ")
+            state = input("Enter state to search : ")
 
             system.search_across_address_books(city=city or None, state=state or None)
 
