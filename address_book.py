@@ -255,6 +255,20 @@ class AddressBook:
             if (city and contact.city.lower() == city.lower()) or (state and contact.state.lower() == state.lower()):
                 count += 1
         return count
+    
+    def sort_entries_by_name(self):
+        '''
+        Description:
+            this function Sorts the contact list alphabetically by first name and last name.
+        Parameters:
+            None
+        Return:
+            None
+        '''
+        self.contacts_list = sorted(self.contacts_list, key=lambda contact: (contact.first_name.lower(), contact.last_name.lower()))
+        print("Contacts sorted alphabetically by name")
+        logger_init("UC-11").info("sorted alphabetically by name")
+        self.display_all_contacts()
 
 
 class System:
@@ -277,6 +291,7 @@ class System:
             self.address_books[name] = AddressBook()
             print(f"Address Book '{name}' created successfully.\n")
             logger_init("UC-6").info("Address book created successfully.")
+
 
     def select_address_book(self):
         '''
@@ -370,7 +385,8 @@ def main():
                           "2. Display All Contacts\n",
                           "3. Edit Existing Contact\n",
                           "4. Delete Contact\n",
-                          "5. Back to Main Menu")
+                          "5. Sort by names all entries\n",
+                          "6. Back to Main Menu")
 
                     sub_choice = input("Enter your choice: ")
 
@@ -397,6 +413,9 @@ def main():
                         selected_address_book.delete_person_from_contacts()
 
                     elif sub_choice == '5':
+                        selected_address_book.sort_entries_by_name()
+
+                    elif sub_choice == '6':
                         break
 
                     else:
