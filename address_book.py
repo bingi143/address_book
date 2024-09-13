@@ -270,6 +270,36 @@ class AddressBook:
         logger_init("UC-11").info("sorted alphabetically by name")
         self.display_all_contacts()
 
+    def sort_entries_by_city(self):
+        '''
+        Description:
+            this function Sorts the contact list alphabetically by city
+        Parameters:
+            None
+        Return:
+            None
+        '''
+
+        self.contacts_list=sorted(self.contacts_list,key=lambda contact: (contact.city.lower()))
+        print("Sorted all entries by city names")
+        logger_init("UC-12").info("Sorted all entries by city names")
+        self.display_all_contacts()
+
+    def sort_entries_by_state(self):
+        '''
+        Description:
+            this function Sorts the contact list alphabetically by state
+        Parameters:
+            None
+        Return:
+            None
+        '''
+
+        self.contacts_list=sorted(self.contacts_list,key=lambda contact: (contact.state.lower()))
+        print("Sorted all entries by state names")
+        logger_init("UC-12").info("Sorted all entries by sate names")
+        self.display_all_contacts()
+
 
 class System:
     def __init__(self):
@@ -386,7 +416,9 @@ def main():
                           "3. Edit Existing Contact\n",
                           "4. Delete Contact\n",
                           "5. Sort by names all entries\n",
-                          "6. Back to Main Menu")
+                          "6. Sort by city\n"
+                          "7. Sort by state\n"
+                          "8. Back to Main Menu")
 
                     sub_choice = input("Enter your choice: ")
 
@@ -416,6 +448,12 @@ def main():
                         selected_address_book.sort_entries_by_name()
 
                     elif sub_choice == '6':
+                        selected_address_book.sort_entries_by_city()
+
+                    elif sub_choice == '7':
+                        selected_address_book.sort_entries_by_state()
+
+                    elif sub_choice == '8':
                         break
 
                     else:
