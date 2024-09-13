@@ -1,5 +1,19 @@
+'''
+
+@Author: Venkatesh 
+@Date: 2024-09-09 18:00:30 
+@Last Modified by: Venkatesh 
+@Last Modified time: 2024-09-06
+18:00:30 
+@Title : Programs on Addressbook 
+
+''' 
+
+
+import json
 import re
 from my_logging import logger_init
+
 
 class Contacts:
     def __init__(self, first_name, last_name, address, city, state, zip_code, phone_number, email):
@@ -13,6 +27,14 @@ class Contacts:
         self.email = email
 
     def display(self):
+        '''
+           Description: 
+                   this function is displaying a specific contacts details
+           Parameters: 
+                   None
+           Return: 
+                   None
+        '''
         print("****************************\n",
               f" first-name: {self.first_name}\n",
               f" last-name: {self.last_name}\n",
@@ -23,6 +45,48 @@ class Contacts:
               f" phone-number: {self.phone_number}\n",
               f" email: {self.email}\n",
               "************************")
+    
+    def to_dict(self):
+        '''
+           Description: 
+                   this function converts contact to a dictionary for saving to a file
+           Parameters: 
+                   None
+           Return: 
+                   Returns the converted data
+        '''
+        return {
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'address': self.address,
+            'city': self.city,
+            'state': self.state,
+            'zip_code': self.zip_code,
+            'phone_number': self.phone_number,
+            'email': self.email
+        }
+    
+    @staticmethod
+    def from_dict(contact_dict):
+        '''
+           Description: 
+                   this function creates a contact object from a dictionary
+           Parameters: 
+                   None
+           Return: 
+                   Returns contacts
+        '''
+        return Contacts(
+            first_name=contact_dict['first_name'],
+            last_name=contact_dict['last_name'],
+            address=contact_dict['address'],
+            city=contact_dict['city'],
+            state=contact_dict['state'],
+            zip_code=contact_dict['zip_code'],
+            phone_number=contact_dict['phone_number'],
+            email=contact_dict['email']
+        )
+    
 
 
 class AddressBook:
@@ -301,6 +365,47 @@ class AddressBook:
         self.display_all_contacts()
 
 
+    def save_to_file(self, file_path):
+        '''
+        Description:
+            this function save the data into file
+        Parameters:
+            None
+        Return:
+            None
+        '''
+        try:
+            with open(file_path, 'w') as file:
+                contacts_data = [contact.to_dict() for contact in self.contacts_list]
+                json.dump(contacts_data, file, indent=4)
+            print(f"Address book saved to {file_path}.")
+            logger_init("UC-13").info(f"Address book saved to {file_path}.")
+        except Exception as e:
+            print(f"Error saving address book: {e}")
+            logger_init("UC-13").error(f"Error saving address book: {e}")
+
+
+    def load_from_file(self, file_path):
+        '''
+        Description:
+            this function load the data from file
+        Parameters:
+            None
+        Return:
+            None
+        '''
+        try:
+            with open(file_path, 'r') as file:
+                contacts_data = json.load(file)
+                self.contacts_list = [Contacts.from_dict(data) for data in contacts_data]
+            print(f"Address book loaded from {file_path}.")
+            logger_init("UC-13").info(f"Address book loaded from {file_path}.")
+        except Exception as e:
+            print(f"Error loading address book: {e}")
+            logger_init("UC-13").error(f"Error loading address book: {e}")
+
+
+
 class System:
     def __init__(self):
         self.address_books = {}
@@ -388,6 +493,41 @@ class System:
                 print(f"From Address Book: {book_name}")
                 contact.display()
 
+    def save_address_book_to_file(self):
+        '''
+        Description:
+            This function save the address book into file
+        Parameters:
+            None
+        Return:
+            None
+        '''
+        address_book = self.select_address_book()
+        if address_book:
+            file_path = input("Enter the file path to save the address book: ")
+            address_book.save_to_file(file_path)
+
+
+    def load_address_book_from_file(self):
+        '''
+        Description:
+            This function load the address book from file
+        Parameters:
+            None
+        Return:
+            None
+        '''
+        book_name = input("Enter a unique name for the Address Book to load: ")
+        file_path = input("Enter the file path to load the address book from: ")
+        if book_name in self.address_books:
+            print(f"Address Book '{book_name}' already exists. Cannot load into it.\n")
+            return
+
+        new_address_book = AddressBook()
+        new_address_book.load_from_file(file_path)
+        self.address_books[book_name] = new_address_book
+        print(f"Address book loaded into '{book_name}'.\n")
+
 
 def main():
     print("Welcome to the Address Book Program")
@@ -398,7 +538,9 @@ def main():
         print("\n1. Create New Address Book\n",
               "2. Select an Address Book\n",
               "3. Search Person by City/State Across Address Books\n",
-              "4. Exit")
+              "4. Save Addreess Book to file\n",
+              "5. Load Address Book from file\n",
+              "6. Exit")
 
         choice = input("Enter your choice: ")
 
@@ -466,6 +608,12 @@ def main():
             system.search_across_address_books(city=city or None, state=state or None)
 
         elif choice == '4':
+            system.save_address_book_to_file()
+
+        elif choice == '5':
+            system.load_address_book_from_file()
+
+        elif choice == '6':
             print("Exiting the Address Book System.")
             break
 
