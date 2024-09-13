@@ -107,7 +107,7 @@ class AddressBook:
         for existing_contact in self.contacts_list:
             if existing_contact.first_name == contact.first_name and existing_contact.last_name == contact.last_name:
                 print(f"Contact {contact.first_name} {contact.last_name} already exists.\n")
-                logger_init("UC-2").info(" This name already exists in contacts.")
+                logger_init("UC-7").info(" This name already exists in contacts.")
                 return
             
         if not self.validate_phone_number(contact.phone_number):
