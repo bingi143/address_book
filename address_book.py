@@ -1,3 +1,15 @@
+'''
+
+@Author: Venkatesh 
+@Date: 2024-09-09 18:00:30 
+@Last Modified by: Venkatesh 
+@Last Modified time: 2024-09-06
+18:00:30 
+@Title : Programs on Addressbook 
+
+''' 
+
+
 import re
 from my_logging import logger_init
 
@@ -13,6 +25,14 @@ class Contacts:
         self.email = email
 
     def display(self):
+        '''
+           Description: 
+                   this function is displaying data
+           Parameters: 
+                   None
+           Return: 
+                   None
+        '''
         print("****************************\n",
               f" first-name: {self.first_name}\n",
               f" last-name: {self.last_name}\n",
