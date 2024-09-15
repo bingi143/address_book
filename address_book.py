@@ -10,10 +10,7 @@
 ''' 
 
 
-<<<<<<< HEAD
-=======
 import json
->>>>>>> UC_13
 import re
 from my_logging import logger_init
 import os
@@ -32,12 +29,8 @@ class Contacts:
 
     def display(self):
         '''
-           Description: 
-<<<<<<< HEAD
-                   this function is displaying data
-=======
-                   this function is displaying a specific contacts details
->>>>>>> UC_13
+           Description:
+                   this function is displaying a specific contacts detail
            Parameters: 
                    None
            Return: 
