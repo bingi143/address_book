@@ -10,8 +10,14 @@
 ''' 
 
 
+<<<<<<< HEAD
+=======
+import json
+>>>>>>> UC_13
 import re
 from my_logging import logger_init
+import os
+
 
 class Contacts:
     def __init__(self, first_name, last_name, address, city, state, zip_code, phone_number, email):
@@ -27,7 +33,11 @@ class Contacts:
     def display(self):
         '''
            Description: 
+<<<<<<< HEAD
                    this function is displaying data
+=======
+                   this function is displaying a specific contacts details
+>>>>>>> UC_13
            Parameters: 
                    None
            Return: 
@@ -43,6 +53,48 @@ class Contacts:
               f" phone-number: {self.phone_number}\n",
               f" email: {self.email}\n",
               "************************")
+    
+    def to_dict(self):
+        '''
+           Description: 
+                   this function converts contact to a dictionary for saving to a file
+           Parameters: 
+                   None
+           Return: 
+                   Returns the converted data
+        '''
+        return {
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'address': self.address,
+            'city': self.city,
+            'state': self.state,
+            'zip_code': self.zip_code,
+            'phone_number': self.phone_number,
+            'email': self.email
+        }
+    
+    @classmethod
+    def from_dict(cls,data):
+        '''
+           Description: 
+                   this function creates a contact object from a dictionary
+           Parameters: 
+                   None
+           Return: 
+                   Returns contacts
+        '''
+        return cls(
+            data['first_name'], 
+            data['last_name'], 
+            data['address'], 
+            data['city'], 
+            data['state'], 
+            data['zip_code'], 
+            data['phone_number'], 
+            data['email']
+        )
+
 
 
 class AddressBook:
@@ -321,6 +373,83 @@ class AddressBook:
         self.display_all_contacts()
 
 
+    def save_to_file(self, file_name):
+        '''
+        Description:
+            this function save the data into file
+        Parameters:
+            None
+        Return:
+            None
+        '''
+        try:
+            # Check if the provided file_name has a directory path
+            directory = os.path.dirname(file_name)
+            if directory and not os.path.exists(directory):
+                os.makedirs(directory)
+            
+            with open(file_name, 'w') as file:
+                for contact in self.contacts_list:
+                    file.write(f"First Name: {contact.first_name}\n")
+                    file.write(f"Last Name: {contact.last_name}\n")
+                    file.write(f"Address: {contact.address}\n")
+                    file.write(f"City: {contact.city}\n")
+                    file.write(f"State: {contact.state}\n")
+                    file.write(f"Zip Code: {contact.zip_code}\n")
+                    file.write(f"Phone Number: {contact.phone_number}\n")
+                    file.write(f"Email: {contact.email}\n")
+                    file.write("-" * 30 + "\n")  # Divider between contacts
+            
+            absolute_path = os.path.abspath(file_name)
+            print(f"Contacts saved to {absolute_path}.\n")
+            logger_init("UC-13").info(f"Contacts saved to {absolute_path}.")
+        except Exception as e:
+            print(f"Error saving to {file_name}: {str(e)}\n")
+            logger_init("UC-13").error(f"Error saving to {file_name}: {str(e)}")
+
+
+    def load_from_file(self, file_name):
+        '''
+        Description:
+            this function load the data from file
+        Parameters:
+            file_name: the name of file to load
+        Return:
+            None
+        '''
+        try:
+            with open(file_name, 'r') as file:
+                data = file.read().split('-' * 30 + "\n")  # Splitting the contacts using the divider
+                for contact_block in data:
+                    lines = contact_block.strip().split("\n")
+                    if len(lines) < 7:  # Ensure there's enough data for a full contact
+                        continue
+                    
+                    # Extracting contact details from each block of text
+                    first_name = lines[0].replace("First Name: ", "")
+                    last_name = lines[1].replace("Last Name: ", "")
+                    address = lines[2].replace("Address: ", "")
+                    city = lines[3].replace("City: ", "")
+                    state = lines[4].replace("State: ", "")
+                    zip_code = lines[5].replace("Zip Code: ", "")
+                    phone_number = lines[6].replace("Phone Number: ", "")
+                    email = lines[7].replace("Email: ", "")
+                    
+                    # Create a Contact object and append to the address book
+                    contact = Contacts(first_name, last_name, address, city, state, zip_code, phone_number, email)
+                    self.contacts_list.append(contact)
+            
+            absolute_path = os.path.abspath(file_name)
+            print(f"Contacts loaded from {absolute_path}.\n")
+            logger_init("UC-13").info(f"Contacts loaded from {absolute_path}.")
+        except FileNotFoundError:
+            print(f"File {file_name} not found. Starting with an empty Address Book.\n")
+            logger_init("UC-13").info(f"File {file_name} not found.")
+        except Exception as e:
+            print(f"Error loading from {file_name}: {str(e)}\n")
+            logger_init("UC-13").error(f"Error loading from {file_name}: {str(e)}")
+
+
 class System:
     def __init__(self):
         self.address_books = {}
@@ -408,6 +537,39 @@ class System:
                 print(f"From Address Book: {book_name}")
                 contact.display()
 
+    def save_address_book_to_file(self,book_name,file_name):
+        '''
+        Description:
+            This function save the address book into file
+        Parameters:
+            book_name: name of the address book
+            file_name: file to save
+        Return:
+            None
+        '''
+        if book_name in self.address_books:
+            self.address_books[book_name].save_to_file(file_name)
+        else:
+            print(f"Address Book '{book_name}' does not exist.\n")
+            logger_init("UC-13").info(f"Address Book '{book_name}' does not exist.")
+        
+
+    def load_address_book_from_file(self,book_name,file_name):
+        '''
+        Description:
+            This function load the address book from file
+        Parameters:
+            book_name: name of the address book
+            file_name: file to load
+        Return:
+            None
+        '''
+        if book_name in self.address_books:
+            self.address_books[book_name].load_from_file(file_name)
+        else:
+            print(f"Address Book '{book_name}' does not exist.\n")
+            logger_init("UC_13").info(f"Address Book '{book_name}' does not exist.\n")
+
 
 def main():
     print("Welcome to the Address Book Program")
@@ -418,7 +580,9 @@ def main():
         print("\n1. Create New Address Book\n",
               "2. Select an Address Book\n",
               "3. Search Person by City/State Across Address Books\n",
-              "4. Exit")
+              "4. Save Addreess Book to file\n",
+              "5. Load Address Book from file\n",
+              "6. Exit")
 
         choice = input("Enter your choice: ")
 
@@ -486,6 +650,16 @@ def main():
             system.search_across_address_books(city=city or None, state=state or None)
 
         elif choice == '4':
+            file_name=input("Enter File name(or path):")
+            book_name=input("Enter address book name:")
+            system.save_address_book_to_file(book_name,file_name)
+
+        elif choice == '5':
+            file_name=input("Enter File name:")
+            book_name=input("Enter address book name:")
+            system.load_address_book_from_file(book_name,file_name)
+
+        elif choice == '6':
             print("Exiting the Address Book System.")
             break
 
