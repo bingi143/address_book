@@ -381,7 +381,7 @@ class AddressBook:
             if directory and not os.path.exists(directory):
                 os.makedirs(directory)
             
-            with open(file_name, 'w') as file:
+            with open(file_name, 'a') as file:
                 for contact in self.contacts_list:
                     file.write(f"First Name: {contact.first_name}\n")
                     file.write(f"Last Name: {contact.last_name}\n")
