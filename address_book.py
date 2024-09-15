@@ -13,6 +13,7 @@
 import json
 import re
 from my_logging import logger_init
+import os
 
 
 class Contacts:
@@ -66,8 +67,8 @@ class Contacts:
             'email': self.email
         }
     
-    @staticmethod
-    def from_dict(contact_dict):
+    @classmethod
+    def from_dict(cls,data):
         '''
            Description: 
                    this function creates a contact object from a dictionary
@@ -76,17 +77,17 @@ class Contacts:
            Return: 
                    Returns contacts
         '''
-        return Contacts(
-            first_name=contact_dict['first_name'],
-            last_name=contact_dict['last_name'],
-            address=contact_dict['address'],
-            city=contact_dict['city'],
-            state=contact_dict['state'],
-            zip_code=contact_dict['zip_code'],
-            phone_number=contact_dict['phone_number'],
-            email=contact_dict['email']
+        return cls(
+            data['first_name'], 
+            data['last_name'], 
+            data['address'], 
+            data['city'], 
+            data['state'], 
+            data['zip_code'], 
+            data['phone_number'], 
+            data['email']
         )
-    
+
 
 
 class AddressBook:
@@ -365,7 +366,7 @@ class AddressBook:
         self.display_all_contacts()
 
 
-    def save_to_file(self, file_path):
+    def save_to_file(self, file_name):
         '''
         Description:
             this function save the data into file
@@ -375,35 +376,71 @@ class AddressBook:
             None
         '''
         try:
-            with open(file_path, 'w') as file:
-                contacts_data = [contact.to_dict() for contact in self.contacts_list]
-                json.dump(contacts_data, file, indent=4)
-            print(f"Address book saved to {file_path}.")
-            logger_init("UC-13").info(f"Address book saved to {file_path}.")
+            # Check if the provided file_name has a directory path
+            directory = os.path.dirname(file_name)
+            if directory and not os.path.exists(directory):
+                os.makedirs(directory)
+            
+            with open(file_name, 'w') as file:
+                for contact in self.contacts_list:
+                    file.write(f"First Name: {contact.first_name}\n")
+                    file.write(f"Last Name: {contact.last_name}\n")
+                    file.write(f"Address: {contact.address}\n")
+                    file.write(f"City: {contact.city}\n")
+                    file.write(f"State: {contact.state}\n")
+                    file.write(f"Zip Code: {contact.zip_code}\n")
+                    file.write(f"Phone Number: {contact.phone_number}\n")
+                    file.write(f"Email: {contact.email}\n")
+                    file.write("-" * 30 + "\n")  # Divider between contacts
+            
+            absolute_path = os.path.abspath(file_name)
+            print(f"Contacts saved to {absolute_path}.\n")
+            logger_init("UC-13").info(f"Contacts saved to {absolute_path}.")
         except Exception as e:
-            print(f"Error saving address book: {e}")
-            logger_init("UC-13").error(f"Error saving address book: {e}")
+            print(f"Error saving to {file_name}: {str(e)}\n")
+            logger_init("UC-13").error(f"Error saving to {file_name}: {str(e)}")
 
 
-    def load_from_file(self, file_path):
+    def load_from_file(self, file_name):
         '''
         Description:
             this function load the data from file
         Parameters:
-            None
+            file_name: the name of file to load
         Return:
             None
         '''
         try:
-            with open(file_path, 'r') as file:
-                contacts_data = json.load(file)
-                self.contacts_list = [Contacts.from_dict(data) for data in contacts_data]
-            print(f"Address book loaded from {file_path}.")
-            logger_init("UC-13").info(f"Address book loaded from {file_path}.")
+            with open(file_name, 'r') as file:
+                data = file.read().split('-' * 30 + "\n")  # Splitting the contacts using the divider
+                for contact_block in data:
+                    lines = contact_block.strip().split("\n")
+                    if len(lines) < 7:  # Ensure there's enough data for a full contact
+                        continue
+                    
+                    # Extracting contact details from each block of text
+                    first_name = lines[0].replace("First Name: ", "")
+                    last_name = lines[1].replace("Last Name: ", "")
+                    address = lines[2].replace("Address: ", "")
+                    city = lines[3].replace("City: ", "")
+                    state = lines[4].replace("State: ", "")
+                    zip_code = lines[5].replace("Zip Code: ", "")
+                    phone_number = lines[6].replace("Phone Number: ", "")
+                    email = lines[7].replace("Email: ", "")
+                    
+                    # Create a Contact object and append to the address book
+                    contact = Contacts(first_name, last_name, address, city, state, zip_code, phone_number, email)
+                    self.contacts_list.append(contact)
+            
+            absolute_path = os.path.abspath(file_name)
+            print(f"Contacts loaded from {absolute_path}.\n")
+            logger_init("UC-13").info(f"Contacts loaded from {absolute_path}.")
+        except FileNotFoundError:
+            print(f"File {file_name} not found. Starting with an empty Address Book.\n")
+            logger_init("UC-13").info(f"File {file_name} not found.")
         except Exception as e:
-            print(f"Error loading address book: {e}")
-            logger_init("UC-13").error(f"Error loading address book: {e}")
-
+            print(f"Error loading from {file_name}: {str(e)}\n")
+            logger_init("UC-13").error(f"Error loading from {file_name}: {str(e)}")
 
 
 class System:
@@ -493,40 +530,38 @@ class System:
                 print(f"From Address Book: {book_name}")
                 contact.display()
 
-    def save_address_book_to_file(self):
+    def save_address_book_to_file(self,book_name,file_name):
         '''
         Description:
             This function save the address book into file
         Parameters:
-            None
+            book_name: name of the address book
+            file_name: file to save
         Return:
             None
         '''
-        address_book = self.select_address_book()
-        if address_book:
-            file_path = input("Enter the file path to save the address book: ")
-            address_book.save_to_file(file_path)
+        if book_name in self.address_books:
+            self.address_books[book_name].save_to_file(file_name)
+        else:
+            print(f"Address Book '{book_name}' does not exist.\n")
+            logger_init("UC-13").info(f"Address Book '{book_name}' does not exist.")
+        
 
-
-    def load_address_book_from_file(self):
+    def load_address_book_from_file(self,book_name,file_name):
         '''
         Description:
             This function load the address book from file
         Parameters:
-            None
+            book_name: name of the address book
+            file_name: file to load
         Return:
             None
         '''
-        book_name = input("Enter a unique name for the Address Book to load: ")
-        file_path = input("Enter the file path to load the address book from: ")
         if book_name in self.address_books:
-            print(f"Address Book '{book_name}' already exists. Cannot load into it.\n")
-            return
-
-        new_address_book = AddressBook()
-        new_address_book.load_from_file(file_path)
-        self.address_books[book_name] = new_address_book
-        print(f"Address book loaded into '{book_name}'.\n")
+            self.address_books[book_name].load_from_file(file_name)
+        else:
+            print(f"Address Book '{book_name}' does not exist.\n")
+            logger_init("UC_13").info(f"Address Book '{book_name}' does not exist.\n")
 
 
 def main():
@@ -608,10 +643,14 @@ def main():
             system.search_across_address_books(city=city or None, state=state or None)
 
         elif choice == '4':
-            system.save_address_book_to_file()
+            file_name=input("Enter File name(or path):")
+            book_name=input("Enter address book name:")
+            system.save_address_book_to_file(book_name,file_name)
 
         elif choice == '5':
-            system.load_address_book_from_file()
+            file_name=input("Enter File name:")
+            book_name=input("Enter address book name:")
+            system.load_address_book_from_file(book_name,file_name)
 
         elif choice == '6':
             print("Exiting the Address Book System.")
