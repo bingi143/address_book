@@ -25,6 +25,14 @@ class Contacts:
         self.email = email
 
     def display(self):
+        '''
+           Description: 
+                   this function is displaying the details 
+           Parameters: 
+                   None
+           Return: 
+                   None
+        '''
         print("****************************\n",
               f" first-name: {self.first_name}\n",
               f" last-name: {self.last_name}\n",
